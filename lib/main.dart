@@ -48,59 +48,94 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  // _ means private, and now it's a state, not a widget
+  var selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
-    var appState =
-        context.watch<MyAppState>(); // watch the state, also acts as a listener
-    var wordPairFromState = appState
-        .current; // so that we do not use the whole appState.current again and again
-
-    Icon icon = appState.favorites.contains(wordPairFromState)
-        ? Icon(Icons.favorite)
-        : Icon(Icons.favorite_border);
-
     return Scaffold(
-      // every build method should return a widget (which also has nested widgets)
-      // provides a default layout for the top-level pages of your app (just nice to have)
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('hi finix:'),
-            ElevatedButton(
-              onPressed: () {
-                print('button pressed!');
-              },
-              child: Text('Testing Button 123'),
-            ),
-            SizedBox(
-                height: 20), // add some space between the text and the buttons
-            Row(
-              mainAxisSize: MainAxisSize
-                  .min, // already center from mainAxisAlignment under Column, so we ask it to be as small as possible (from the center)
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    appState.getNext();
-                  },
-                  child: Icon(Icons.refresh),
+      body: Row(
+        children: [
+          SafeArea(
+            // safe area is the area that is not covered by the system UI (like the notch or the status bar)
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home),
+                  label: Text('Home'),
                 ),
-                SizedBox(width: 15), // add some space between the buttons
-                ElevatedButton.icon(
-                  onPressed: () {
-                    appState.toggleFavorite();
-                  },
-                  icon: icon,
-                  label: Text('Favorite'),
+                NavigationRailDestination(
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
                 ),
               ],
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                setState(() {
+                  selectedIndex = value;
+                });
+              },
             ),
-            SizedBox(
-                height: 20), // add some space between the buttons and the card
-            BigCard(wordPairFromState: wordPairFromState),
-          ],
-        ),
+          ),
+          Expanded(
+            // hey, give me all the space you can
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var wordPair = appState.current;
+
+    IconData icon;
+    if (appState.favorites.contains(wordPair)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(wordPair: wordPair),
+          SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.toggleFavorite();
+                },
+                icon: Icon(icon),
+                label: Text('Like'),
+              ),
+              SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  appState.getNext();
+                },
+                child: Text('New Word'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -109,10 +144,10 @@ class MyHomePage extends StatelessWidget {
 class BigCard extends StatelessWidget {
   const BigCard({
     super.key,
-    required this.wordPairFromState,
+    required this.wordPair,
   });
 
-  final WordPair wordPairFromState;
+  final WordPair wordPair;
 
   @override
   Widget build(BuildContext context) {
@@ -128,9 +163,9 @@ class BigCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(28.0),
         child: Text(
-          wordPairFromState.asPascalCase,
+          wordPair.asPascalCase,
           style: style,
-          semanticsLabel: wordPairFromState.asPascalCase,
+          semanticsLabel: wordPair.asPascalCase,
         ),
       ),
     );
