@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         ),
         home: MyHomePage(),
       ),
@@ -60,16 +60,13 @@ class MyHomePage extends StatelessWidget {
       child: Scaffold(
         body: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        appState.newWord();
-                      },
-                      child: Text('New Word')),
-                  Text(currentWord.asPascalCase),
+                  WordCard(currentWord: currentWord),
                 ],
               ),
               Row(
@@ -80,14 +77,49 @@ class MyHomePage extends StatelessWidget {
                       appState.updateFavourite();
                     },
                     icon: icon,
-                    label: Text(
-                        'Love current word which is ${currentWord.asPascalCase}'),
+                    label: Text('Love ${currentWord.asPascalCase}'),
                   )
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        appState.newWord();
+                      },
+                      label: Text('Next'),
+                      icon: Icon(Icons.arrow_forward)),
                 ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class WordCard extends StatelessWidget {
+  const WordCard({
+    super.key,
+    required this.currentWord,
+  });
+
+  final WordPair currentWord;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Text(
+        'Your word is ${currentWord.asPascalCase}',
+        style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.primary),
       ),
     );
   }
