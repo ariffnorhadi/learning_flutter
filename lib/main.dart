@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 0:
         return HomePage();
       case 1:
-        return Placeholder();
+        return FavoritesPage();
       default:
         return HomePage();
     }
@@ -146,6 +146,27 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  const FavoritesPage({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var favourite = appState.favourite;
+
+    return ListView.builder(
+      itemCount: favourite.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(favourite[index].asPascalCase),
+        );
+      },
     );
   }
 }
