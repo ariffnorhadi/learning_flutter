@@ -58,6 +58,10 @@ class MyHomePage extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Text('Learning App',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -95,8 +99,33 @@ class MyHomePage extends StatelessWidget {
             ],
           ),
         ),
+        bottomNavigationBar: MyNavigator(),
       ),
     );
+  }
+}
+
+class MyNavigator extends StatefulWidget {
+  const MyNavigator({super.key});
+
+  @override
+  State<MyNavigator> createState() => _MyNavigatorState();
+}
+
+class _MyNavigatorState extends State<MyNavigator> {
+  @override
+  Widget build(BuildContext context) {
+    var items = [
+      BottomNavigationBarItem(
+        icon: Icon(Icons.home),
+        label: 'Home',
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.favorite),
+        label: 'Favourite',
+      ),
+    ];
+    return BottomNavigationBar(items: items);
   }
 }
 
