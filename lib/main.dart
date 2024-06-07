@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-        title: 'Namer App',
+        title: 'Learning App',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
@@ -45,75 +45,23 @@ class MyAppState extends ChangeNotifier {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var currentWord = appState.currentWord;
-
-    Icon icon = Icon(Icons.favorite_border);
-    icon = appState.favourite.contains(currentWord)
-        ? Icon(Icons.favorite)
-        : Icon(Icons.favorite_border);
-
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Learning App',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  WordCard(currentWord: currentWord),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      appState.updateFavourite();
-                    },
-                    icon: icon,
-                    label: Text('Love ${currentWord.asPascalCase}'),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                      onPressed: () {
-                        appState.newWord();
-                      },
-                      label: Text('Next'),
-                      icon: Icon(Icons.arrow_forward)),
-                ],
-              ),
-            ],
-          ),
-        ),
-        bottomNavigationBar: MyNavigator(),
-      ),
-    );
-  }
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class MyNavigator extends StatefulWidget {
-  const MyNavigator({super.key});
-
-  @override
-  State<MyNavigator> createState() => _MyNavigatorState();
-}
-
-class _MyNavigatorState extends State<MyNavigator> {
+class _MyHomePageState extends State<MyHomePage> {
   var currentIndex = 0;
+  var items = [
+    BottomNavigationBarItem(
+      icon: Icon(Icons.home),
+      label: 'Home',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.favorite),
+      label: 'Favourite',
+    ),
+  ];
 
   void onItemTapped(int index) {
     setState(() {
@@ -121,20 +69,84 @@ class _MyNavigatorState extends State<MyNavigator> {
     });
   }
 
+  StatelessWidget pageBuilder(int index) {
+    switch (index) {
+      case 0:
+        return HomePage();
+      case 1:
+        return Placeholder();
+      default:
+        return HomePage();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var items = [
-      BottomNavigationBarItem(
-        icon: Icon(Icons.home),
-        label: 'Home',
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Learning App',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+        body: pageBuilder(currentIndex),
+        bottomNavigationBar: BottomNavigationBar(
+            items: items, currentIndex: currentIndex, onTap: onItemTapped),
       ),
-      BottomNavigationBarItem(
-        icon: Icon(Icons.favorite),
-        label: 'Favourite',
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var currentWord = appState.currentWord;
+    var icon = Icon(Icons.favorite_border);
+    icon = appState.favourite.contains(currentWord)
+        ? Icon(Icons.favorite)
+        : Icon(Icons.favorite_border);
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              WordCard(currentWord: currentWord),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  appState.updateFavourite();
+                },
+                icon: icon,
+                label: Text('Love ${currentWord.asPascalCase}'),
+              )
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                  onPressed: () {
+                    appState.newWord();
+                  },
+                  label: Text('Next'),
+                  icon: Icon(Icons.arrow_forward)),
+            ],
+          ),
+        ],
       ),
-    ];
-    return BottomNavigationBar(
-        items: items, currentIndex: currentIndex, onTap: onItemTapped);
+    );
   }
 }
 
