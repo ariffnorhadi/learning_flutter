@@ -113,6 +113,14 @@ class MyNavigator extends StatefulWidget {
 }
 
 class _MyNavigatorState extends State<MyNavigator> {
+  var currentIndex = 0;
+
+  void onItemTapped(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var items = [
@@ -125,7 +133,8 @@ class _MyNavigatorState extends State<MyNavigator> {
         label: 'Favourite',
       ),
     ];
-    return BottomNavigationBar(items: items);
+    return BottomNavigationBar(
+        items: items, currentIndex: currentIndex, onTap: onItemTapped);
   }
 }
 
